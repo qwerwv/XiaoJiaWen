@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第二页 - eLuvLetter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image: url('./img/beijng1.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 添加半透明遮罩，确保文字清晰可读 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            max-width: 700px;
+            margin: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #fff;
+        }
+
+        p {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .navigation {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px;
+                margin: 15px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            p {
+                font-size: 18px;
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-btn {
+                width: 200px;
+                text-align: center;
+            }
+        }
+
+
+        /* 左上角渐隐文字样式 */
+        .fade-text {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            z-index: 3;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeInUp 2s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        .fade-text h2 {
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fade-text p {
+            font-size: 1.2em;
+            margin: 0;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        /* 右上角返回首页按钮 */
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 右下角下一页按钮 */
+        .next-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .next-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 过渡覆盖层 */
+        .transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .transition-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* 过渡文字容器 */
+        .transition-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease-in-out;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            max-width: 80%;
+            line-height: 1.4;
+        }
+
+        .transition-text.active {
+            opacity: 1;
+        }
+
+        /* 文字行样式 */
+        .text-line {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            margin: 20px 0;
+            display: block;
+        }
+
+        .text-line.show {
+            opacity: 1;
+        }
+
+        /* 简单的渐隐动画 */
+        @keyframes fadeInSimple {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOutSimple {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        .text-line.fade-in-animation {
+            animation: fadeInSimple 1.5s ease-in-out forwards;
+        }
+
+        .text-line.fade-out-animation {
+            animation: fadeOutSimple 1s ease-in-out forwards;
+        }
+
+        /* 文字导航指示器 */
+        .text-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10001;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .text-indicator.show {
+            opacity: 1;
+        }
+
+        /* 渐隐动画 */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 波纹动画 */
+        @keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* 背景文字容器 */
+        .background-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* 文字块样式 */
+        .text-block {
+            position: absolute;
+            max-width: 600px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-block:nth-child(1) {
+            top: 15%;
+            left: 10%;
+        }
+
+        .text-block:nth-child(2) {
+            top: 25%;
+            right: 10%;
+        }
+
+        .text-block:nth-child(3) {
+            bottom: 35%;
+            left: 15%;
+        }
+
+        .text-block:nth-child(4) {
+            bottom: 15%;
+            right: 15%;
+        }
+
+        .text-block h3 {
+            font-size: 1.8em;
+            margin: 0 0 15px 0;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-block p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 渐隐动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            animation: fadeInUp 2s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0.8;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .fade-text {
+                top: 20px;
+                left: 20px;
+            }
+
+            .fade-text h2 {
+                font-size: 2em;
+            }
+
+            .fade-text p {
+                font-size: 1em;
+            }
+
+            .text-block {
+                max-width: 90%;
+                padding: 15px;
+            }
+
+            .text-block h3 {
+                font-size: 1.4em;
+            }
+
+            .text-block p {
+                font-size: 0.9em;
+            }
+
+            .text-block:nth-child(1),
+            .text-block:nth-child(2),
+            .text-block:nth-child(3),
+            .text-block:nth-child(4) {
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                margin: 20px auto;
+            }
+
+            .background-text {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左上角渐隐文字 -->
+    <div class="fade-text">
+        <h2>温馨回忆</h2>
+        <p>珍藏每一份美好</p>
+    </div>
+
+    <!-- 背景渐隐文字内容 -->
+    <div class="background-text">
+        <div class="text-block fade-in" style="animation-delay: 0s;">
+            <h3>时光如歌</h3>
+            <p>岁月如流水，带走了青春的容颜，却留下了深深的思念。</p>
+        </div>
+        <div class="text-block fade-in" style="animation-delay: 2s;">
+            <h3>情意绵绵</h3>
+            <p>在这个特别的日子里，愿所有的美好都如期而至。</p>
+        </div>
+        <div class="text-block fade-in" style="animation-delay: 4s;">
+            <h3>永恒记忆</h3>
+            <p>有些情感，即使时光荏苒，也永远不会褪色。</p>
+        </div>
+        <div class="text-block fade-in" style="animation-delay: 6s;">
+            <h3>心灵寄语</h3>
+            <p>愿这份情谊如星辰般璀璨，照亮彼此的人生旅途。</p>
+        </div>
+    </div>
+
+    <!-- 右上角返回首页按钮 -->
+    <a href="index.html" class="home-btn">🏠 返回首页</a>
+
+    <!-- 右下角下一页按钮 -->
+    <button class="next-btn">下一页 →</button>
+
+    <!-- 过渡覆盖层 -->
+    <div class="transition-overlay"></div>
+
+    <!-- 过渡文字 -->
+    <div class="transition-text"></div>
+
+    <!-- 文字导航指示器 -->
+    <div class="text-indicator">使用鼠标滚轮回看文字</div>
+
+    <script type="text/javascript" src="js/analytics.js"></script>
+    <script>
+        // 文字展示和滚轮回看功能
+        function showTextLines(texts) {
+            const transitionText = document.querySelector('.transition-text');
+            const overlay = document.querySelector('.transition-overlay');
+            const nextBtn = document.querySelector('.next-btn');
+
+            // 清空容器
+            transitionText.innerHTML = '';
+
+            // 创建文字行元素
+            const textLines = [];
+            texts.forEach((text, index) => {
+                const line = document.createElement('div');
+                line.className = 'text-line';
+                line.textContent = text;
+                line.style.display = 'none'; // 初始隐藏所有行
+                transitionText.appendChild(line);
+                textLines.push(line);
+            });
+
+            // 逐行显示文字（一次只显示一行）
+            let currentIndex = 0;
+            const showNextLine = () => {
+                if (currentIndex < textLines.length) {
+                    // 隐藏所有行
+                    textLines.forEach(line => {
+                        line.style.display = 'none';
+                        line.classList.remove('show');
+                    });
+
+                    // 显示当前行
+                    textLines[currentIndex].style.display = 'block';
+                    textLines[currentIndex].classList.add('fade-in-animation');
+
+                    // 动画结束后添加show类以确保状态保持
+                    setTimeout(() => {
+                        textLines[currentIndex].classList.add('show');
+                        textLines[currentIndex].classList.remove('fade-in-animation');
+                    }, 1500);
+
+                    currentIndex++;
+
+                    if (currentIndex < textLines.length) {
+                        setTimeout(showNextLine, 2000); // 每行显示2秒
+                    } else {
+                        // 所有文字显示完毕，停留在最后一行，启用滚轮回看
+                        enableScrollNavigation(textLines);
+                    }
+                }
+            };
+
+            // 开始显示第一行
+            setTimeout(showNextLine, 500);
+        }
+
+        // 启用鼠标滚轮回看功能
+        function enableScrollNavigation(textLines) {
+            const transitionText = document.querySelector('.transition-text');
+            const overlay = document.querySelector('.transition-overlay');
+            const nextBtn = document.querySelector('.next-btn');
+            const indicator = document.querySelector('.text-indicator');
+
+            let currentIndex = textLines.length - 1; // 从最后一行开始
+
+            // 显示提示（放在最后）
+            indicator.textContent = '使用鼠标滚轮回看文字';
+            indicator.classList.add('show');
+
+            // 鼠标滚轮事件
+            const handleScroll = (e) => {
+                e.preventDefault();
+
+                if (e.deltaY > 0) {
+                    // 向下滚动：显示下一行（如果还有）
+                    if (currentIndex < textLines.length - 1) {
+                        currentIndex++;
+                        updateTextDisplay(textLines, currentIndex);
+                    }
+                } else {
+                    // 向上滚动：显示上一行
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        updateTextDisplay(textLines, currentIndex);
+                    }
+                }
+            };
+
+            // 更新文字显示（一次只显示一行）
+            function updateTextDisplay(lines, index) {
+                lines.forEach((line, i) => {
+                    if (i === index) {
+                        // 显示当前行
+                        line.style.display = 'block';
+                        line.classList.add('fade-in-animation');
+
+                        setTimeout(() => {
+                            line.classList.add('show');
+                            line.classList.remove('fade-in-animation');
+                        }, 1500);
+                    } else {
+                        // 隐藏其他行
+                        if (line.style.display === 'block') {
+                            line.classList.add('fade-out-animation');
+
+                            setTimeout(() => {
+                                line.style.display = 'none';
+                                line.classList.remove('show', 'fade-out-animation');
+                            }, 1000);
+                        } else {
+                            line.style.display = 'none';
+                            line.classList.remove('show');
+                        }
+                    }
+                });
+            }
+
+            // 添加滚轮事件监听到整个文档
+            document.addEventListener('wheel', handleScroll, { passive: false });
+
+            // 点击任意位置退出
+            const handleClick = () => {
+                transitionText.classList.remove('active');
+                overlay.classList.remove('active');
+                indicator.classList.remove('show');
+                transitionText.innerHTML = '';
+                nextBtn.disabled = false;
+
+                // 移除事件监听器
+                document.removeEventListener('wheel', handleScroll);
+                document.removeEventListener('click', handleClick);
+            };
+
+            document.addEventListener('click', handleClick);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const content = document.querySelector('.content');
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            const homeBtn = document.querySelector('.home-btn');
+            const overlay = document.querySelector('.transition-overlay');
+            const transitionText = document.querySelector('.transition-text');
+
+            // 页面加载动画（只有当.content元素存在时才执行）
+            if (content) {
+                content.style.opacity = '0';
+                content.style.transform = 'translateY(30px)';
+                content.style.transition = 'all 0.8s ease';
+
+                setTimeout(() => {
+                    content.style.opacity = '1';
+                    content.style.transform = 'translateY(0)';
+                }, 100);
+            }
+
+            // 下一页按钮点击事件
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    // 防止重复点击
+                    if (this.disabled) return;
+                    this.disabled = true;
+
+                    // 设置过渡文字（你可以后期修改这些文字）
+                    const texts = [
+                        '回忆如流水，永不停息',
+                        '每一个瞬间都值得珍藏',
+                        '爱在心中，永不褪色',
+                        '时光荏苒，真情永恒',
+                        '美好的故事还在继续'
+                    ];
+
+                    // 先显示黑色背景（溶解效果）
+                    overlay.classList.add('active');
+
+                    // 等待背景完全变黑后再显示文字
+                    setTimeout(() => {
+                        transitionText.classList.add('active');
+                        showTextLines(texts);
+                    }, 2000);
+                });
+            }
+
+            // 为返回首页按钮添加点击效果
+            if (homeBtn) {
+                homeBtn.addEventListener('click', function(e) {
+                    // 添加点击波纹效果
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+                    ripple.style.pointerEvents = 'none';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+
+                    this.style.position = 'position: relative';
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

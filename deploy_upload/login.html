@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - eLuvLetter</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
+    <link rel="stylesheet" href="css/login.css" />
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <!-- 视频背景 -->
+    <video id="background-video" autoplay muted loop playsinline>
+        <source src="vido/video_2000380511.mp4" type="video/mp4">
+        您的浏览器不支持视频播放。
+    </video>
+
+    <!-- 雪花容器 -->
+    <div id="snow-container"></div>
+
+    <!-- 加载过渡层 -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>正在进入...</p>
+        </div>
+    </div>
+
+    <!-- 忘记密码弹窗 -->
+    <div id="forgot-password-modal" class="forgot-modal">
+        <div class="forgot-content">
+            <div class="forgot-header">
+                <h3>💡 账户信息提示</h3>
+                <button class="forgot-close" onclick="closeForgotPasswordModal()">&times;</button>
+            </div>
+            <div class="forgot-body">
+                <p><strong>账号为你的名字拼音</strong></p>
+                <p><strong>密码为你的身份证出生日期</strong></p>
+                <div class="forgot-example">
+                    <p class="example-title">例如：</p>
+                    <p class="example-text">账号：zhangsan</p>
+                    <p class="example-text">密码：060909</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录表单 -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>eLuvLetter</h1>
+                <p>欢迎</p>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required placeholder="请输入用户名">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required placeholder="请输入密码">
+                </div>
+
+                <button type="submit" class="login-btn">登录</button>
+
+                <div class="login-footer">
+                    <a href="#" class="forgot-password" onclick="showAccountInfo(); return false;">忘记密码？</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 创建雪花效果
+        function createSnowflakes() {
+            const container = document.getElementById('snow-container');
+            const snowCount = 80; // 增加雪花数量
+
+            for (let i = 0; i < snowCount; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+
+                // 随机大小
+                const size = Math.random() * 4 + 2;
+                snowflake.style.width = `${size}px`;
+                snowflake.style.height = `${size}px`;
+
+                // 随机初始位置
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.top = Math.random() * 100 + '%';
+
+                // 随机动画延迟和持续时间
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 5;
+                snowflake.style.animationDuration = `${duration}s`;
+                snowflake.style.animationDelay = `${delay}s`;
+
+                container.appendChild(snowflake);
+            }
+        }
+
+        // 显示账户信息弹窗
+        function showAccountInfo() {
+            const modal = document.getElementById('forgot-password-modal');
+            modal.classList.add('show');
+
+            // 10秒后自动隐藏
+            setTimeout(() => {
+                closeForgotPasswordModal();
+            }, 10000);
+        }
+
+        // 关闭忘记密码弹窗
+        function closeForgotPasswordModal() {
+            const modal = document.getElementById('forgot-password-modal');
+            modal.classList.add('hiding');
+
+            // 等待淡出动画完成后再移除show类
+            setTimeout(() => {
+                modal.classList.remove('show', 'hiding');
+            }, 500);
+        }
+
+        // 点击遮罩层关闭弹窗
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('forgot-password-modal');
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeForgotPasswordModal();
+                }
+            });
+        });
+
+        // 登录表单处理
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // 基础表单验证
+            if (username && password) {
+                // 显示加载状态
+                const submitBtn = this.querySelector('.login-btn');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = '验证中...';
+                submitBtn.disabled = true;
+
+                try {
+                    // 调用后端验证
+                    const isAuthenticated = await authenticateUser(username, password);
+
+                    if (isAuthenticated) {
+                        showLoadingTransition();
+                    } else {
+                        alert('❌ 用户名或密码错误\n\n💡 提示：\n账号为你的名字拼音\n密码为你的身份证出生日期\n\n点击"忘记密码？"查看示例');
+                    }
+                } catch (error) {
+                    alert('登录失败，请稍后重试');
+                } finally {
+                    // 恢复按钮状态
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            } else {
+                alert('请输入用户名和密码');
+            }
+        });
+
+        // 后端登录验证
+        async function authenticateUser(username, password) {
+            try {
+                // 设置API基础地址 - 修改为您的服务器地址
+                const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://localhost:9091'
+                    : 'https://www.qingning.icu';
+
+                console.log('发送登录请求:', { username, password: '***' });
+                console.log('API基础地址:', API_BASE);
+                const response = await fetch(API_BASE + '/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                console.log('响应状态:', response.status);
+
+                const data = await response.json();
+                console.log('响应数据:', data);
+
+                if (data.success) {
+                    // 保存令牌到本地存储
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userInfo', JSON.stringify(data.user));
+                    console.log('登录成功');
+                    return true;
+                } else {
+                    console.log('登录失败:', data.message);
+                    alert(data.message || '用户名或密码错误');
+                    return false;
+                }
+            } catch (error) {
+                console.error('登录验证失败:', error);
+                alert('网络错误，请稍后重试');
+                return false;
+            }
+        }
+
+        // 显示加载过渡动画
+        async function showLoadingTransition() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.add('active');
+
+            // 2秒后跳转到主页
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+
+        // 视频背景处理
+        function setupVideoBackground() {
+            const video = document.getElementById('background-video');
+
+            // 确保视频自动播放
+            video.play().catch(error => {
+                console.log('视频自动播放失败:', error);
+                // 用户交互后尝试播放
+                document.addEventListener('click', function playVideo() {
+                    video.play();
+                    document.removeEventListener('click', playVideo);
+                });
+            });
+
+            // 视频加载失败时显示备用背景
+            video.addEventListener('error', function() {
+                console.log('视频加载失败，使用备用背景');
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            });
+        }
+
+        // 动画循环
+        function animate() {
+            // 简单的动画循环，可以添加其他动画效果
+            requestAnimationFrame(animate);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createSnowflakes();
+            setupVideoBackground();
+
+            // 启动动画循环
+            animate();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+/* 页面加载动画 */
+.page-loader {
+    position: fixed;
+    inset: 0;
+    background: #0d0d1a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    z-index: 99999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+/* dissolve handled by canvas, no CSS fade-out */
+
+/* 心形容器 + 光环 */
+.loader-ring-group {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid transparent;
+}
+
+.loader-ring-1 {
+    width: 100%;
+    height: 100%;
+    border-top-color: rgba(255, 107, 157, 0.4);
+    border-right-color: rgba(255, 107, 157, 0.1);
+    animation: loaderSpin 3s linear infinite;
+}
+
+.loader-ring-2 {
+    width: 85%;
+    height: 85%;
+    border-bottom-color: rgba(192, 132, 252, 0.35);
+    border-left-color: rgba(192, 132, 252, 0.1);
+    animation: loaderSpin 2.4s linear infinite reverse;
+}
+
+.loader-ring-3 {
+    width: 70%;
+    height: 70%;
+    border-top-color: rgba(96, 165, 250, 0.3);
+    border-right-color: rgba(96, 165, 250, 0.08);
+    animation: loaderSpin 1.8s linear infinite;
+}
+
+@keyframes loaderSpin {
+    to { transform: rotate(360deg); }
+}
+
+.loader-heart-svg {
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 12px rgba(255, 107, 157, 0.5));
+    animation: heartPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.12); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+    60% { transform: scale(1); }
+}
+
+.heart-draw {
+    fill: none;
+    stroke-width: 0.55;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.heart-fill {
+    filter: url(#heartGlow);
+}
+
+/* 品牌文字 */
+.loader-brand {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #ff6b9d, #c084fc, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.15em;
+    font-weight: 400;
+    letter-spacing: 10px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1s forwards;
+}
+
+/* 进度条 */
+.loader-progress-wrap {
+    width: 200px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 0.6s ease 1.4s forwards;
+}
+
+.loader-progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #ff6b9d, #c084fc, #60a5fa);
+    box-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+    transition: width 0.3s ease;
+}
+
+/* 提示文字 */
+.loader-tip {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.78em;
+    letter-spacing: 2px;
+    opacity: 0;
+    animation: fadeIn 0.8s ease 1.8s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+/* 登录页面样式 */
+
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 视频背景样式 */
+#background-video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* 确保视频在所有设备上都能正常显示 */
+@media (max-width: 768px) {
+    #background-video {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* 添加深色遮罩层，使内容更清晰 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+/* 雪花容器 */
+#snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* 雪花样式 */
+.snowflake {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: snowfall linear infinite;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
+}
+
+@keyframes snowfall {
+    0% {
+        transform: translateY(-10px) translateX(0px);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(100vh) translateX(50px);
+        opacity: 0;
+    }
+}
+
+/* 登录容器 */
+.login-container {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* 登录卡片 - 玻璃模糊效果 */
+.login-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 登录头部 */
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    color: white;
+    font-size: 2.5em;
+    font-weight: 300;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.login-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1em;
+    font-weight: 300;
+}
+
+/* 登录表单 */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: white;
+    font-size: 0.9em;
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.form-group input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    color: white;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* 登录按钮 */
+.login-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    color: white;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+/* 登录页脚 */
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.forgot-password {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 30px 20px;
+    }
+
+    .login-header h1 {
+        font-size: 2em;
+    }
+
+    .login-header p {
+        font-size: 1em;
+    }
+
+    .form-group input {
+        padding: 12px;
+    }
+
+    .login-btn {
+        padding: 12px;
+        font-size: 1em;
+    }
+}
+
+/* 添加一些额外的动画效果 */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.login-card {
+    animation: slideIn 0.6s ease-out, float 6s ease-in-out infinite;
+    animation-delay: 0s, 0.6s;
+}
+
+/* 输入框聚焦时的波纹效果 */
+.form-group input:focus {
+    animation: inputFocus 0.3s ease;
+}
+
+@keyframes inputFocus {
+    0% {
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* 加载过渡层样式 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+
+/* 加载过渡层的遮罩 */
+.loading-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+/* 忘记密码弹窗样式（无遮罩版本） */
+.forgot-modal {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+
+.forgot-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.forgot-modal.hiding {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.forgot-content {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 0;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: slideDownFade 0.5s ease;
+    min-width: 350px;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.forgot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.forgot-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.forgot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.forgot-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.forgot-body {
+    padding: 15px 20px 20px;
+    color: white;
+}
+
+.forgot-body p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.forgot-body strong {
+    color: #ffcc02;
+    font-weight: 600;
+}
+
+.forgot-example {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+    border-left: 3px solid #ff6b9d;
+}
+
+.example-title {
+    margin: 0 0 6px 0;
+    color: #ffa726;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.example-text {
+    margin: 4px 0;
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 0.9em;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-content p {
+    font-size: 1.2em;
+    font-weight: 300;
+    animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+}

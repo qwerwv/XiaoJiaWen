@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - eLuvLetter</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
+    <link rel="stylesheet" href="css/login.css" />
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <!-- 页面加载动画 -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-ring-group">
+            <div class="loader-ring loader-ring-1"></div>
+            <div class="loader-ring loader-ring-2"></div>
+            <div class="loader-ring loader-ring-3"></div>
+            <svg class="loader-heart-svg" viewBox="0 0 32 32" width="72" height="72">
+                <defs>
+                    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ff6b9d"/>
+                        <stop offset="50%" stop-color="#c084fc"/>
+                        <stop offset="100%" stop-color="#60a5fa"/>
+                    </linearGradient>
+                    <filter id="heartGlow">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feMerge>
+                            <feMergeNode in="blur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path class="heart-draw" d="M16 28.72a1 1 0 0 1-.63-.23C14.5 27.81 2 17.17 2 9.5A7.5 7.5 0 0 1 16 5.36 7.5 7.5 0 0 1 30 9.5c0 7.67-12.5 18.31-13.37 18.99a1 1 0 0 1-.63.23z"
+                      stroke="url(#heartGrad)" filter="url(#heartGlow)"
+                      stroke-dasharray="100" stroke-dashoffset="100">
+                    <animate attributeName="stroke-dashoffset" from="100" to="0" dur="1.8s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+                </path>
+                <path class="heart-fill" d="M16 28.72a1 1 0 0 1-.63-.23C14.5 27.81 2 17.17 2 9.5A7.5 7.5 0 0 1 16 5.36 7.5 7.5 0 0 1 30 9.5c0 7.67-12.5 18.31-13.37 18.99a1 1 0 0 1-.63.23z"
+                      fill="url(#heartGrad)" opacity="0">
+                    <animate attributeName="opacity" values="0;0.15;0" dur="2.5s" repeatCount="indefinite"/>
+                </path>
+            </svg>
+        </div>
+        <p class="loader-brand">eLuvLetter</p>
+        <div class="loader-progress-wrap">
+            <div class="loader-progress-bar" id="loader-progress-bar"></div>
+        </div>
+        <p class="loader-tip" id="loader-tip">正在为你准备一切...</p>
+    </div>
+
+    <!-- 视频背景 -->
+    <video id="background-video" autoplay muted loop playsinline>
+        <source src="vido/video_2000380511.mp4" type="video/mp4">
+        您的浏览器不支持视频播放。
+    </video>
+
+    <!-- 雪花容器 -->
+    <div id="snow-container"></div>
+
+    <!-- 加载过渡层 -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>正在进入...</p>
+        </div>
+    </div>
+
+    <!-- 忘记密码弹窗 -->
+    <div id="forgot-password-modal" class="forgot-modal">
+        <div class="forgot-content">
+            <div class="forgot-header">
+                <h3>💡 账户信息提示</h3>
+                <button class="forgot-close" onclick="closeForgotPasswordModal()">&times;</button>
+            </div>
+            <div class="forgot-body">
+                <p><strong>账号为你的名字拼音</strong></p>
+                <p><strong>密码为你的身份证出生日期</strong></p>
+                <div class="forgot-example">
+                    <p class="example-title">例如：</p>
+                    <p class="example-text">账号：zhangsan</p>
+                    <p class="example-text">密码：060909</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录表单 -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 id="login-greeting-title"></h1>
+                <p id="login-greeting"></p>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required placeholder="请输入用户名">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required placeholder="请输入密码">
+                </div>
+
+                <button type="submit" class="login-btn">登录</button>
+
+                <div class="login-footer">
+                    <a href="#" class="forgot-password" onclick="showAccountInfo(); return false;">忘记密码？</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 创建雪花效果
+        function createSnowflakes() {
+            const container = document.getElementById('snow-container');
+            const snowCount = 80; // 增加雪花数量
+
+            for (let i = 0; i < snowCount; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+
+                // 随机大小
+                const size = Math.random() * 4 + 2;
+                snowflake.style.width = `${size}px`;
+                snowflake.style.height = `${size}px`;
+
+                // 随机初始位置
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.top = Math.random() * 100 + '%';
+
+                // 随机动画延迟和持续时间
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 5;
+                snowflake.style.animationDuration = `${duration}s`;
+                snowflake.style.animationDelay = `${delay}s`;
+
+                container.appendChild(snowflake);
+            }
+        }
+
+        // 显示账户信息弹窗
+        function showAccountInfo() {
+            const modal = document.getElementById('forgot-password-modal');
+            modal.classList.add('show');
+
+            // 10秒后自动隐藏
+            setTimeout(() => {
+                closeForgotPasswordModal();
+            }, 10000);
+        }
+
+        // 关闭忘记密码弹窗
+        function closeForgotPasswordModal() {
+            const modal = document.getElementById('forgot-password-modal');
+            modal.classList.add('hiding');
+
+            // 等待淡出动画完成后再移除show类
+            setTimeout(() => {
+                modal.classList.remove('show', 'hiding');
+            }, 500);
+        }
+
+        // 点击遮罩层关闭弹窗
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('forgot-password-modal');
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeForgotPasswordModal();
+                }
+            });
+        });
+
+        // 登录表单处理
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // 基础表单验证
+            if (username && password) {
+                // 显示加载状态
+                const submitBtn = this.querySelector('.login-btn');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = '验证中...';
+                submitBtn.disabled = true;
+
+                try {
+                    // 调用后端验证
+                    const isAuthenticated = await authenticateUser(username, password);
+
+                    if (isAuthenticated) {
+                        showLoadingTransition();
+                    } else {
+                        alert('❌ 用户名或密码错误\n\n💡 提示：\n账号为你的名字拼音\n密码为你的身份证出生日期\n\n点击"忘记密码？"查看示例');
+                    }
+                } catch (error) {
+                    alert('登录失败，请稍后重试');
+                } finally {
+                    // 恢复按钮状态
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            } else {
+                alert('请输入用户名和密码');
+            }
+        });
+
+        // 后端登录验证
+        async function authenticateUser(username, password) {
+            // ========== 开发测试模式 ==========
+            // 本地环境直接使用测试账号跳过后端验证，方便前端调试
+            const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const DEV_USER = 'xiaojiawen';   // 测试账号
+            const DEV_PASS = '060820';       // 测试密码
+            if (isDev && username === DEV_USER && password === DEV_PASS) {
+                console.log('[DEV] 开发模式：使用测试账号直接登录');
+                localStorage.setItem('authToken', 'dev-test-token');
+                localStorage.setItem('userInfo', JSON.stringify({ username: DEV_USER, role: 'dev' }));
+                return true;
+            }
+            // ========== 开发测试模式结束 ==========
+
+            try {
+                // 设置API基础地址 - 修改为您的服务器地址
+                const API_BASE = isDev
+                    ? 'http://localhost:3100'  // 修改为你的实际端口
+                    : 'https://www.qingning.icu';
+
+                console.log('发送登录请求:', { username, password: '***' });
+                console.log('API基础地址:', API_BASE);
+                const response = await fetch(API_BASE + '/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                console.log('响应状态:', response.status);
+
+                const data = await response.json();
+                console.log('响应数据:', data);
+
+                if (data.success) {
+                    // 保存令牌到本地存储
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userInfo', JSON.stringify(data.user));
+                    console.log('登录成功');
+                    return true;
+                } else {
+                    console.log('登录失败:', data.message);
+                    alert(data.message || '用户名或密码错误');
+                    return false;
+                }
+            } catch (error) {
+                console.error('登录验证失败:', error);
+                alert('网络错误，请稍后重试');
+                return false;
+            }
+        }
+
+        // 显示加载过渡动画
+        async function showLoadingTransition() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.add('active');
+
+            // 2秒后跳转到主页
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+
+        // 视频背景处理
+        function setupVideoBackground() {
+            const video = document.getElementById('background-video');
+
+            // 确保视频自动播放
+            video.play().catch(error => {
+                console.log('视频自动播放失败:', error);
+                // 用户交互后尝试播放
+                document.addEventListener('click', function playVideo() {
+                    video.play();
+                    document.removeEventListener('click', playVideo);
+                });
+            });
+
+            // 视频加载失败时显示备用背景
+            video.addEventListener('error', function() {
+                console.log('视频加载失败，使用备用背景');
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            });
+        }
+
+        // 动画循环
+        function animate() {
+            // 简单的动画循环，可以添加其他动画效果
+            requestAnimationFrame(animate);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createSnowflakes();
+            setupVideoBackground();
+
+            // 启动动画循环
+            animate();
+
+            // 隐藏页面加载动画（确保动画播放完毕）
+            const pageLoader = document.getElementById('page-loader');
+
+            // 根据时间段显示问候语
+            const hour = new Date().getHours();
+            const title = document.getElementById('login-greeting-title');
+            const greeting = document.getElementById('login-greeting');
+            if (hour >= 5 && hour < 11) {
+                title.textContent = '早安';
+                greeting.textContent = '记得吃早餐，这样才能快快长大哦';
+            } else if (hour >= 11 && hour < 13) {
+                title.textContent = '中午好';
+                greeting.textContent = '一天又过半啦，吃个午饭休息一下吧';
+            } else if (hour >= 13 && hour < 17) {
+                title.textContent = '下午好';
+                greeting.textContent = '希望你天天都能有个好心情~';
+            } else if (hour >= 17 && hour < 20) {
+                title.textContent = '傍晚好';
+                greeting.textContent = '夕阳很美，记得抬头看一看';
+            } else {
+                title.textContent = '晚安';
+                greeting.textContent = '放下一切烦恼，记得早点休息';
+            }
+
+            // 进度条驱动
+            const progressBar = document.getElementById('loader-progress-bar');
+            const loaderTip = document.getElementById('loader-tip');
+            const tips = ['正在为你准备一切...', '加载浪漫元素中...', '即将呈现...'];
+            let progress = 0;
+            let progressTarget = 90;
+
+            const progressTimer = setInterval(function() {
+                if (progress < progressTarget) {
+                    // 前 70% 快，后面减速
+                    const speed = progress < 70 ? 2.5 : 0.8;
+                    progress += speed;
+                    if (progress > progressTarget) progress = progressTarget;
+                    progressBar.style.width = progress + '%';
+                }
+            }, 50);
+
+            // 切换提示文字
+            setTimeout(() => { loaderTip.textContent = tips[1]; }, 1200);
+            setTimeout(() => { loaderTip.textContent = tips[2]; }, 2200);
+
+            // 水滴溶解效果
+            function startWaterDissolve(loader, onComplete) {
+                loader.style.display = 'none';
+
+                const canvas = document.createElement('canvas');
+                const W = canvas.width = window.innerWidth;
+                const H = canvas.height = window.innerHeight;
+                canvas.style.cssText = 'position:fixed;inset:0;z-index:100000;pointer-events:none';
+                document.body.appendChild(canvas);
+                const ctx = canvas.getContext('2d');
+
+                // 画满深色遮罩
+                const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+                bgGrad.addColorStop(0, '#0d0d1a');
+                bgGrad.addColorStop(0.35, '#1a1030');
+                bgGrad.addColorStop(0.65, '#2a1040');
+                bgGrad.addColorStop(1, '#0d0d1a');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, W, H);
+
+                // 水滴参数
+                const drops = [];
+                const dropCount = Math.max(25, Math.floor(W * H / 30000));
+                const maxRadius = Math.sqrt(W*W + H*H) * 0.38;
+                const fallDist = H * 0.4 + Math.random() * H * 0.3;
+
+                // 生成所有水滴 — 完全随机的时间和位置
+                for (let i = 0; i < dropCount; i++) {
+                    drops.push({
+                        landX: Math.random() * W,
+                        landY: Math.random() * H,
+                        startY: -30 - Math.random() * fallDist,
+                        landTime: 200 + Math.random() * 4500,
+                        maxR: maxRadius * (0.35 + Math.random() * 0.65),
+                        expandMs: 800 + Math.random() * 1000,
+                        phase: 'fall',
+                        impactTime: 0,
+                        splashes: []
+                    });
+                }
+                // 打乱顺序
+                drops.sort(() => Math.random() - 0.5);
+
+                let lastTime = performance.now();
+                // 记录每颗水滴已擦除的圆，用于每帧重绘
+                // （destination-out 是永久的，需要每帧重建遮罩再擦除）
+
+                function frame(now) {
+                    const dt = Math.min(50, now - lastTime);
+                    lastTime = now;
+
+                    // 每帧重建：先重绘深色遮罩，再用 destination-out 擦除所有已着陆的圆
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.globalAlpha = 1;
+                    ctx.fillStyle = bgGrad;
+                    ctx.fillRect(0, 0, W, H);
+
+                    // 擦除所有已着陆水滴的扩散区域
+                    for (const d of drops) {
+                        if (d.phase !== 'fall') {
+                            const elapsed = now - d.impactTime;
+                            const expandT = Math.min(1, Math.max(0, (elapsed - 80)) / d.expandMs);
+                            const eased = 1 - Math.pow(1 - expandT, 4);
+                            const r = eased * d.maxR;
+                            if (r > 1) {
+                                ctx.globalCompositeOperation = 'destination-out';
+                                ctx.globalAlpha = 1;
+                                const grad = ctx.createRadialGradient(d.landX, d.landY, 0, d.landX, d.landY, r);
+                                grad.addColorStop(0, 'rgba(0,0,0,1)');
+                                grad.addColorStop(0.7, 'rgba(0,0,0,1)');
+                                grad.addColorStop(0.9, 'rgba(0,0,0,0.6)');
+                                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                                ctx.fillStyle = grad;
+                                ctx.beginPath();
+                                ctx.arc(d.landX, d.landY, r, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        }
+                    }
+
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.globalAlpha = 1;
+
+                    // 绘制下落中的水滴
+                    for (const d of drops) {
+                        if (d.phase === 'fall') {
+                            if (now < d.landTime) {
+                                // 下落中：画水滴形状
+                                const progress = Math.max(0, (now - (d.landTime - 600)) / 600);
+                                if (progress > 0) {
+                                    const eased = progress < 1 ? progress * progress : 1;
+                                    const dropY = d.startY + (d.landY - d.startY) * eased;
+                                    const dropAlpha = Math.min(1, progress * 2);
+                                    ctx.globalAlpha = dropAlpha * 0.8;
+                                    ctx.fillStyle = '#96c8ff';
+                                    // 水滴形状：上尖下圆
+                                    ctx.beginPath();
+                                    const sz = 4 + progress * 3;
+                                    ctx.ellipse(d.landX, dropY, sz * 0.6, sz, 0, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    // 发光
+                                    ctx.globalAlpha = dropAlpha * 0.3;
+                                    ctx.fillStyle = '#c084fc';
+                                    ctx.beginPath();
+                                    ctx.ellipse(d.landX, dropY, sz * 1.2, sz * 1.5, 0, 0, Math.PI * 2);
+                                    ctx.fill();
+                                }
+                            } else {
+                                // 着陆！切换到 impact
+                                d.phase = 'impact';
+                                d.impactTime = now;
+                                // 生成溅射小水滴
+                                for (let s = 0; s < 5 + Math.random() * 4; s++) {
+                                    const angle = Math.random() * Math.PI * 2;
+                                    const speed = 80 + Math.random() * 200;
+                                    d.splashes.push({
+                                        x: d.landX, y: d.landY,
+                                        vx: Math.cos(angle) * speed,
+                                        vy: Math.sin(angle) * speed - 100 - Math.random() * 150,
+                                        life: 0.4 + Math.random() * 0.3,
+                                        born: now,
+                                        r: 1.5 + Math.random() * 2
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    // 绘制着陆闪光和扩散圆
+                    for (const d of drops) {
+                        if (d.phase === 'impact' || d.phase === 'expand') {
+                            const elapsed = now - d.impactTime;
+
+                            if (elapsed < 80) {
+                                // 着陆闪光
+                                d.phase = 'impact';
+                                const flashT = elapsed / 80;
+                                ctx.globalAlpha = (1 - flashT) * 0.9;
+                                const flashR = 8 + flashT * 25;
+                                const flashGrad = ctx.createRadialGradient(d.landX, d.landY, 0, d.landX, d.landY, flashR);
+                                flashGrad.addColorStop(0, 'rgba(200,220,255,0.9)');
+                                flashGrad.addColorStop(0.5, 'rgba(150,180,255,0.4)');
+                                flashGrad.addColorStop(1, 'rgba(100,140,255,0)');
+                                ctx.fillStyle = flashGrad;
+                                ctx.beginPath();
+                                ctx.arc(d.landX, d.landY, flashR, 0, Math.PI * 2);
+                                ctx.fill();
+                            } else {
+                                d.phase = 'expand';
+                                const expandT = Math.min(1, (elapsed - 80) / d.expandMs);
+                                const eased = 1 - Math.pow(1 - expandT, 4);
+                                const r = eased * d.maxR;
+
+                                if (r > 1 && expandT < 1) {
+                                    // 边缘发光环（只在扩散未完成时绘制）
+                                    ctx.globalAlpha = (1 - expandT) * 0.5;
+                                    ctx.strokeStyle = 'rgba(150,200,255,0.6)';
+                                    ctx.lineWidth = 2;
+                                    ctx.beginPath();
+                                    ctx.arc(d.landX, d.landY, r, 0, Math.PI * 2);
+                                    ctx.stroke();
+
+                                    // 内部微光
+                                    if (expandT < 0.5) {
+                                        ctx.globalAlpha = (1 - expandT * 2) * 0.15;
+                                        const innerGrad = ctx.createRadialGradient(d.landX, d.landY, 0, d.landX, d.landY, r * 0.6);
+                                        innerGrad.addColorStop(0, 'rgba(180,210,255,0.3)');
+                                        innerGrad.addColorStop(1, 'rgba(180,210,255,0)');
+                                        ctx.fillStyle = innerGrad;
+                                        ctx.beginPath();
+                                        ctx.arc(d.landX, d.landY, r * 0.6, 0, Math.PI * 2);
+                                        ctx.fill();
+                                    }
+                                }
+
+                                if (expandT >= 1) d.phase = 'done';
+                            }
+                        }
+                    }
+
+                    ctx.globalAlpha = 1;
+                    ctx.globalCompositeOperation = 'source-over';
+
+                    // 绘制溅射小水滴
+                    for (const d of drops) {
+                        for (const s of d.splashes) {
+                            const age = (now - s.born) / 1000;
+                            if (age > s.life) continue;
+                            s.vy += 500 * (dt / 1000);
+                            s.x += s.vx * (dt / 1000);
+                            s.y += s.vy * (dt / 1000);
+                            const alpha = (1 - age / s.life) * 0.7;
+                            ctx.globalAlpha = alpha;
+                            ctx.fillStyle = '#a0d0ff';
+                            ctx.beginPath();
+                            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    ctx.globalAlpha = 1;
+
+                    // 检查完成
+                    const allDone = drops.every(d => d.phase === 'done');
+                    if (allDone) {
+                        // 清除残留的发光环
+                        ctx.clearRect(0, 0, W, H);
+                        canvas.remove();
+                        if (onComplete) onComplete();
+                    } else {
+                        requestAnimationFrame(frame);
+                    }
+                }
+
+                requestAnimationFrame(frame);
+            }
+
+            let pageLoaded = false;
+            let minTimePassed = false;
+            let loaderHidden = false;
+
+            function tryHidePageLoader() {
+                if (loaderHidden) return;
+                if (pageLoaded && minTimePassed) {
+                    loaderHidden = true;
+                    clearInterval(progressTimer);
+                    progressTarget = 100;
+                    progressBar.style.width = '100%';
+                    loaderTip.textContent = '欢迎到来';
+
+                    setTimeout(() => {
+                        startWaterDissolve(pageLoader, () => pageLoader.remove());
+                    }, 500);
+                }
+            }
+
+            window.addEventListener('load', function() {
+                pageLoaded = true;
+                tryHidePageLoader();
+            });
+            if (document.readyState === 'complete') {
+                pageLoaded = true;
+            }
+
+            setTimeout(function() {
+                minTimePassed = true;
+                tryHidePageLoader();
+            }, 2500);
+
+            // 兜底：最多 4 秒
+            setTimeout(function() {
+                if (!loaderHidden) {
+                    loaderHidden = true;
+                    clearInterval(progressTimer);
+                    progressBar.style.width = '100%';
+                    startWaterDissolve(pageLoader, () => pageLoader.remove());
+                }
+            }, 4000);
+        });
+    </script>
+</body>
+</html>
