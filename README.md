@@ -99,7 +99,7 @@ sequenceDiagram
 
 ## API 说明
 
-| 接口 | 用途 | 我在服务端的处理方式 |
+| 接口 | 用途 | 在服务端的处理方式 |
 | --- | --- | --- |
 | `POST /api/login` | 登录 | 校验用户名和密码，通过 bcrypt 比对密码哈希；成功后生成有效期 24 小时的 JWT。 |
 | `GET /api/verify` | 校验登录令牌 | 从 `Authorization: Bearer <token>` 读取并验证 JWT。 |
@@ -159,7 +159,7 @@ npm run dev      # 使用 Nodemon 开发模式
 
 ## 生产部署
 
-生产环境中，我建议使用以下链路：
+生产环境中，建议使用以下链路：
 
 ```mermaid
 flowchart LR
