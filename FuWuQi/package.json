@@ -1,0 +1,39 @@
+{
+  "name": "eluvletter",
+  "version": "1.0.0",
+  "description": "eLuvLetter with backend API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "copy .env.development .env && nodemon server.js",
+    "dev-start": "copy .env.development .env && node server.js",
+    "serve": "npm start",
+    "pm2-start": "pm2 start server.js --name eLuvLetter",
+    "pm2-dev": "copy .env.development .env && pm2 start server.js --name eLuvLetter-dev --watch",
+    "pm2-stop": "pm2 stop eLuvLetter",
+    "pm2-stop-dev": "pm2 stop eLuvLetter-dev",
+    "pm2-restart": "pm2 restart eLuvLetter",
+    "pm2-restart-dev": "pm2 restart eLuvLetter-dev",
+    "pm2-logs": "pm2 logs eLuvLetter",
+    "pm2-logs-dev": "pm2 logs eLuvLetter-dev"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.10.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.22.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "love",
+    "letter",
+    "web"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
