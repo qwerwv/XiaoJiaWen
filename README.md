@@ -1,6 +1,6 @@
 # XiaoJiaWen · eLuvLetter
 
-> 我开发的一个沉浸式电子情书网站。  
+> 此项目为我大二时喜欢的一位名叫肖佳雯的女孩所创建
 > 项目地址：<https://github.com/qwerwv/XiaoJiaWen/tree/main>
 
 ## 项目介绍
