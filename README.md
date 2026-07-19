@@ -25,7 +25,7 @@ flowchart LR
 ## 页面展示
 
 ### 1. 登录页
-![登录页截图](./Zhanshipng/屏幕截图2026-07-19233559.png)
+![登录页截图](./Zhanshipng/loginlogin.png)
 
 访问地址：`/login` 或 `/login.html`
 
