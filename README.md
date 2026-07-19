@@ -38,7 +38,7 @@ flowchart LR
 ### 2. 情书主页
 访问地址：`/` 或 `/index.html`
 
-![登录页截图](./Zhanshipng/xinfengZheng.png)
+![信封主页](./Zhanshipng/xinfengZheng.png)
 
 这是项目的核心页面。我使用 Canvas/WebGL 绘制樱花飘落背景，并做了带邮票、火漆封口和信纸翻转效果的 3D 信封。
 
@@ -64,9 +64,12 @@ flowchart LR
 
 访问地址：`/page2.html`
 
+![Html2](./Zhanshipng/html2.png)
+
 这一页以固定背景图片 `img/beijng1.jpeg` 为基础，加入暗色遮罩、半透明卡片和渐显动画。在页面中放置了“温馨回忆”“时光如歌”“情意绵绵”“永恒记忆”“心灵寄语”等回忆文案。
 
 点击“下一页”后，页面会切换到黑色转场背景，逐行显示回忆文字，并生成随机祝福语和装饰元素。文字展示完成后，用户可以使用鼠标滚轮回看前面的内容；页面右上角可以返回情书主页。
+![祝福弹窗](./Zhanshipng/zhufu.png)
 
 ## 前后端连接方式
 
